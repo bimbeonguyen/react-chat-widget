@@ -13,6 +13,11 @@
   z-index: 9999;
 }
 
+.rcw-widget-content {
+  display: flex;
+  justify-content: space-between;
+}
+
 .rcw-full-screen {
   @include widget-container-fs;
 }
