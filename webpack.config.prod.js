@@ -17,7 +17,11 @@ module.exports = {
     libraryTarget: 'umd'
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js']
+    extensions: ['.tsx', '.ts', '.js'],
+    alias: {
+      React: path.resolve(__dirname, './node_modules/react/'),
+      ReactDOM: path.resolve(__dirname, './node_modules/react-dom/')
+    }
   },
   target: 'web',
   mode: 'production',
