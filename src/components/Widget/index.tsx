@@ -27,6 +27,7 @@ type Props = {
   imagePreview?: boolean;
   zoomStep?: number;
   handleSubmit?: AnyFunction;
+  ChatList: React.ElementType;
 }
 
 function Widget({
@@ -49,7 +50,8 @@ function Widget({
   showTimeStamp,
   imagePreview,
   zoomStep,
-  handleSubmit
+  handleSubmit,
+  ChatList,
 }: Props) {
   const dispatch = useDispatch();
 
@@ -98,6 +100,7 @@ function Widget({
       showTimeStamp={showTimeStamp}
       imagePreview={imagePreview}
       zoomStep={zoomStep}
+      ChatList={ChatList}
     />
   );
 }
