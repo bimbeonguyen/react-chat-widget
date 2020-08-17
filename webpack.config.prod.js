@@ -17,11 +17,7 @@ module.exports = {
     libraryTarget: 'umd'
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
-    alias: {
-      React: path.resolve(__dirname, './node_modules/react/'),
-      ReactDOM: path.resolve(__dirname, './node_modules/react-dom/')
-    }
+    extensions: ['.tsx', '.ts', '.js']
   },
   target: 'web',
   mode: 'production',
@@ -88,16 +84,8 @@ module.exports = {
     }),
   ],
   externals: {
-    react: {
-      commonjs: 'React',
-      commonjs2: 'react',
-      amd: 'react'
-    },
-    'react-dom': {
-      commonjs: 'ReactDOM',
-      commonjs2: 'react-dom',
-      amd: 'react-dom'
-    }
+    react: 'react',
+    'react-dom': 'react-dom'
   },
   optimization: {
     minimizer: [
