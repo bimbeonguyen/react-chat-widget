@@ -29,6 +29,7 @@ type Props = {
   zoomStep?: number;
   handleSubmit?: AnyFunction;
   ChatList: React.ElementType;
+  CustomNoConversation?: React.ElementType;
 } & typeof defaultProps;
 
 function ConnectedWidget({
@@ -53,6 +54,7 @@ function ConnectedWidget({
   zoomStep,
   handleSubmit,
   ChatList,
+  CustomNoConversation
 }: Props) {
   return (
     <Provider store={store}>
@@ -78,6 +80,7 @@ function ConnectedWidget({
         zoomStep={zoomStep}
         handleSubmit={handleSubmit}
         ChatList={ChatList}
+        CustomNoConversation={CustomNoConversation}
       />
     </Provider>
   );

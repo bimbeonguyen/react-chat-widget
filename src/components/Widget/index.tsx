@@ -28,6 +28,7 @@ type Props = {
   zoomStep?: number;
   handleSubmit?: AnyFunction;
   ChatList: React.ElementType;
+  CustomNoConversation?: React.ElementType;
 }
 
 function Widget({
@@ -52,6 +53,7 @@ function Widget({
   zoomStep,
   handleSubmit,
   ChatList,
+  CustomNoConversation
 }: Props) {
   const dispatch = useDispatch();
 
@@ -101,6 +103,7 @@ function Widget({
       imagePreview={imagePreview}
       zoomStep={zoomStep}
       ChatList={ChatList}
+      CustomNoConversation={CustomNoConversation}
     />
   );
 }

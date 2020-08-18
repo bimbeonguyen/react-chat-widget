@@ -34,6 +34,7 @@ type Props = {
   imagePreview?: boolean;
   zoomStep?: number;
   ChatList: React.ElementType;
+  CustomNoConversation?: React.ElementType;
 }
 
 function WidgetLayout({
@@ -58,11 +59,12 @@ function WidgetLayout({
   imagePreview,
   zoomStep,
   ChatList,
+  CustomNoConversation
 }: Props) {
   const dispatch = useDispatch();
-  const { dissableInput, showChat, visible } = useSelector((state: GlobalState) => ({
+  const { disableInput, showChat, visible } = useSelector((state: GlobalState) => ({
     showChat: state.behavior.showChat,
-    dissableInput: state.behavior.disabledInput,
+    disableInput: state.behavior.disabledInput,
     visible: state.preview.visible,
   }));
 
@@ -119,23 +121,31 @@ function WidgetLayout({
       {showChat &&
         <div className="rcw-widget-content">
           <ChatList />
-          <Conversation
-            title={title}
-            subtitle={subtitle}
-            sendMessage={onSendMessage}
-            senderPlaceHolder={senderPlaceHolder}
-            profileAvatar={profileAvatar}
-            toggleChat={onToggleConversation}
-            showCloseButton={showCloseButton}
-            disabledInput={dissableInput}
-            autofocus={autofocus}
-            titleAvatar={titleAvatar}
-            className={showChat ? 'active' : 'hidden'}
-            onQuickButtonClicked={onQuickButtonClicked}
-            onTextInputChange={onTextInputChange}
-            sendButtonAlt={sendButtonAlt}
-            showTimeStamp={showTimeStamp}
-          />
+          {
+            CustomNoConversation ? (
+              <div className="rcw-conversation-container">
+                <CustomNoConversation />
+              </div>
+            ) : (
+              <Conversation
+                title={title}
+                subtitle={subtitle}
+                sendMessage={onSendMessage}
+                senderPlaceHolder={senderPlaceHolder}
+                profileAvatar={profileAvatar}
+                toggleChat={onToggleConversation}
+                showCloseButton={showCloseButton}
+                disabledInput={disableInput}
+                autofocus={autofocus}
+                titleAvatar={titleAvatar}
+                className={showChat ? 'active' : 'hidden'}
+                onQuickButtonClicked={onQuickButtonClicked}
+                onTextInputChange={onTextInputChange}
+                sendButtonAlt={sendButtonAlt}
+                showTimeStamp={showTimeStamp}
+              />
+            )
+          }
         </div>
       }
       {customLauncher ?
