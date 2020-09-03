@@ -29,6 +29,7 @@ type Props = {
   handleSubmit?: AnyFunction;
   ChatList: React.ElementType;
   CustomNoConversation?: React.ElementType;
+  onToggleChat?: AnyFunction;
 }
 
 function Widget({
@@ -53,12 +54,16 @@ function Widget({
   zoomStep,
   handleSubmit,
   ChatList,
-  CustomNoConversation
+  CustomNoConversation,
+  onToggleChat
 }: Props) {
   const dispatch = useDispatch();
 
   const toggleConversation = () => {
     dispatch(toggleChat());
+    if (onToggleChat) {
+      onToggleChat();
+    }
   }
 
   const handleMessageSubmit = (event) => {

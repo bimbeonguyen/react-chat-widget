@@ -30,6 +30,7 @@ type Props = {
   handleSubmit?: AnyFunction;
   ChatList: React.ElementType;
   CustomNoConversation?: React.ElementType;
+  onToggleChat?: AnyFunction;
 } & typeof defaultProps;
 
 function ConnectedWidget({
@@ -54,7 +55,8 @@ function ConnectedWidget({
   zoomStep,
   handleSubmit,
   ChatList,
-  CustomNoConversation
+  CustomNoConversation,
+  onToggleChat,
 }: Props) {
   return (
     <Provider store={store}>
@@ -81,6 +83,7 @@ function ConnectedWidget({
         handleSubmit={handleSubmit}
         ChatList={ChatList}
         CustomNoConversation={CustomNoConversation}
+        onToggleChat={onToggleChat}
       />
     </Provider>
   );
