@@ -35,6 +35,8 @@ type Props = {
   zoomStep?: number;
   ChatList: React.ElementType;
   CustomNoConversation?: React.ElementType;
+  loadMoreMessages?: AnyFunction;
+  LoadingIcon?: React.ElementType;
 }
 
 function WidgetLayout({
@@ -59,7 +61,9 @@ function WidgetLayout({
   imagePreview,
   zoomStep,
   ChatList,
-  CustomNoConversation
+  CustomNoConversation,
+  loadMoreMessages,
+  LoadingIcon
 }: Props) {
   const dispatch = useDispatch();
   const { disableInput, showChat, visible } = useSelector((state: GlobalState) => ({
@@ -143,6 +147,8 @@ function WidgetLayout({
                 onTextInputChange={onTextInputChange}
                 sendButtonAlt={sendButtonAlt}
                 showTimeStamp={showTimeStamp}
+                loadMoreMessages={loadMoreMessages}
+                LoadingIcon={LoadingIcon}
               />
             )
           }

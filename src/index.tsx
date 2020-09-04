@@ -31,6 +31,8 @@ type Props = {
   ChatList: React.ElementType;
   CustomNoConversation?: React.ElementType;
   onToggleChat?: AnyFunction;
+  loadMoreMessages?: AnyFunction;
+  LoadingIcon?: React.ElementType;
 } & typeof defaultProps;
 
 function ConnectedWidget({
@@ -57,6 +59,8 @@ function ConnectedWidget({
   ChatList,
   CustomNoConversation,
   onToggleChat,
+  loadMoreMessages,
+  LoadingIcon,
 }: Props) {
   return (
     <Provider store={store}>
@@ -84,6 +88,8 @@ function ConnectedWidget({
         ChatList={ChatList}
         CustomNoConversation={CustomNoConversation}
         onToggleChat={onToggleChat}
+        loadMoreMessages={loadMoreMessages}
+        LoadingIcon={LoadingIcon}
       />
     </Provider>
   );

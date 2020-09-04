@@ -30,6 +30,8 @@ type Props = {
   ChatList: React.ElementType;
   CustomNoConversation?: React.ElementType;
   onToggleChat?: AnyFunction;
+  loadMoreMessages?: AnyFunction;
+  LoadingIcon?: React.ElementType;
 }
 
 function Widget({
@@ -55,12 +57,15 @@ function Widget({
   handleSubmit,
   ChatList,
   CustomNoConversation,
-  onToggleChat
+  onToggleChat,
+  loadMoreMessages,
+  LoadingIcon
 }: Props) {
   const dispatch = useDispatch();
 
   const toggleConversation = () => {
     dispatch(toggleChat());
+    debugger;
     if (onToggleChat) {
       onToggleChat();
     }
@@ -109,6 +114,8 @@ function Widget({
       zoomStep={zoomStep}
       ChatList={ChatList}
       CustomNoConversation={CustomNoConversation}
+      loadMoreMessages={loadMoreMessages}
+      LoadingIcon={LoadingIcon}
     />
   );
 }

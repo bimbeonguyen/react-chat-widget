@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, ElementRef, ImgHTMLAttributes, MouseEvent } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import format from 'date-fns/format';
+import { useScroll } from 'react-use';
 
 import { scrollToBottom } from '../../../../../../utils/messages';
 import { Message, Link, CustomCompMessage, GlobalState } from '../../../../../../store/types';
@@ -8,13 +9,16 @@ import { setBadgeCount, markAllMessagesRead } from '@actions';
 
 import Loader from './components/Loader';
 import './styles.scss';
+import { AnyFunction } from '../../../../../../utils/types';
 
 type Props = {
   showTimeStamp: boolean,
   profileAvatar?: string;
+  loadMoreMessages?: AnyFunction;
+  LoadingIcon?: React.ElementType;
 }
 
-function Messages({ profileAvatar, showTimeStamp }: Props) {
+function Messages({ profileAvatar, showTimeStamp, loadMoreMessages, LoadingIcon }: Props) {
   const dispatch = useDispatch();
   const { messages, typing, showChat, badgeCount } = useSelector((state: GlobalState) => ({
     messages: state.messages.messages,
@@ -22,8 +26,14 @@ function Messages({ profileAvatar, showTimeStamp }: Props) {
     typing: state.behavior.messageLoader,
     showChat: state.behavior.showChat
   }));
-
   const messageRef = useRef<HTMLDivElement | null>(null);
+  const { y } = useScroll(messageRef);
+
+  useEffect(() => {
+    if (y === 0 && loadMoreMessages) {
+      loadMoreMessages();
+    }
+  }, [y]);
   useEffect(() => {
     // @ts-ignore
     scrollToBottom(messageRef.current);
@@ -49,6 +59,9 @@ function Messages({ profileAvatar, showTimeStamp }: Props) {
 
   return (
     <div id="messages" className="rcw-messages-container" ref={messageRef}>
+      {LoadingIcon && (
+        <LoadingIcon />
+      )}
       {messages?.map((message, index) =>
         <div className="rcw-message" key={`${index}-${format(message.timestamp, 'hh:mm')}`}>
           {profileAvatar &&
