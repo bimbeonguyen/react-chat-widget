@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState, ElementRef, ImgHTMLAttributes, MouseEvent } from 'react';
+import React, { useEffect, useRef, useState, RefObject } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import format from 'date-fns/format';
-import { useScroll } from 'react-use';
-
+import { usePrevious, useScrolling } from 'react-use';
+import { useBottomScrollListener } from 'react-bottom-scroll-listener';
 import { scrollToBottom } from '../../../../../../utils/messages';
 import { Message, Link, CustomCompMessage, GlobalState } from '../../../../../../store/types';
 import { setBadgeCount, markAllMessagesRead } from '@actions';
@@ -10,6 +10,7 @@ import { setBadgeCount, markAllMessagesRead } from '@actions';
 import Loader from './components/Loader';
 import './styles.scss';
 import { AnyFunction } from '../../../../../../utils/types';
+import { MESSAGE_SENDER } from '../../../../../../constants';
 
 type Props = {
   showTimeStamp: boolean,
@@ -26,21 +27,27 @@ function Messages({ profileAvatar, showTimeStamp, loadMoreMessages, LoadingIcon 
     typing: state.behavior.messageLoader,
     showChat: state.behavior.showChat
   }));
-  const messageRef = useRef<HTMLDivElement | null>(null);
-  const { y } = useScroll(messageRef);
-
-  useEffect(() => {
-    if (y === 0 && loadMoreMessages) {
-      loadMoreMessages();
+  const prevMessages = usePrevious(messages);
+  // tracking on which page we currently are
+  const [page, setPage] = useState(1);
+  const [atBottom, setAtBottom] = useState(true);
+  const loadingRef = useRef<HTMLDivElement | null>(null);
+  const onBottom = () => {
+    setAtBottom(true);
+    if (showChat && badgeCount) {
+      dispatch(markAllMessagesRead());
     }
-  }, [y]);
-  useEffect(() => {
-    // @ts-ignore
-    scrollToBottom(messageRef.current);
-    if (showChat && badgeCount) dispatch(markAllMessagesRead());
-    else dispatch(setBadgeCount(messages.filter((message) => message.unread).length));
-  }, [messages, badgeCount, showChat]);
-    
+  };
+  const containerRef = useBottomScrollListener(onBottom) as RefObject<HTMLDivElement>;
+  const scrolling = useScrolling(containerRef);
+  // here we handle what happens when user scrolls to Load More div
+  // in this case we just update page variable
+  const handleObserver = (entities) => {
+    const target = entities[0];
+    if (target.isIntersecting) {
+      setPage((page) => page + 1)
+    }
+  }
   const getComponentToRender = (message: Message | Link | CustomCompMessage) => {
     const ComponentToRender = message.component;
     if (message.type === 'component') {
@@ -57,10 +64,53 @@ function Messages({ profileAvatar, showTimeStamp, loadMoreMessages, LoadingIcon 
   //   }
   // }
 
+  useEffect(() => {
+    const handleAtBottom = () => {
+      scrollToBottom(loadingRef.current);
+      if (showChat && badgeCount) {
+        dispatch(markAllMessagesRead());
+      } else dispatch(setBadgeCount(messages.filter((message) => message.unread).length));
+    };
+
+    if ((messages || []).length !== (prevMessages || []).length) {
+      const latestMessage = messages[messages.length - 1];
+
+      if (latestMessage.sender === MESSAGE_SENDER.CLIENT) {
+        handleAtBottom();
+      }
+    } else if (atBottom) {
+      handleAtBottom();
+    }
+  }, [messages, badgeCount, showChat]);
+  useEffect(() => {
+    const options = {
+      root: document.querySelector('#messages'),
+      rootMargin: "0px",
+      threshold: 1.0
+    };
+    // initialize IntersectionObserver
+    // and attaching to Load More div
+    const observer = new IntersectionObserver(handleObserver, options);
+
+    if (loadingRef.current) {
+      observer.observe(loadingRef.current)
+    }
+  }, []);
+  useEffect(() => {
+    if (loadMoreMessages) {
+      loadMoreMessages();
+    }
+  }, [page])
+  useEffect(() => {
+    if (scrolling && atBottom) {
+      setAtBottom(false);
+    }
+  }, [scrolling]);
+
   return (
-    <div id="messages" className="rcw-messages-container" ref={messageRef}>
+    <div id="messages" className="rcw-messages-container" ref={containerRef}>
       {LoadingIcon && (
-        <LoadingIcon />
+        <LoadingIcon ref={loadingRef} />
       )}
       {messages?.map((message, index) =>
         <div className="rcw-message" key={`${index}-${format(message.timestamp, 'hh:mm')}`}>
