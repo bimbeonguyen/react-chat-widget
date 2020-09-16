@@ -31,7 +31,7 @@ function Messages({ profileAvatar, showTimeStamp, loadMoreMessages, LoadingIcon 
   // tracking on which page we currently are
   const [page, setPage] = useState(1);
   const [atBottom, setAtBottom] = useState(true);
-  const loadingRef = useRef<HTMLDivElement | null>(null);
+  const loadingRef = useRef<HTMLDivElement | null>(null) as React.MutableRefObject<HTMLInputElement>;
   const onBottom = () => {
     setAtBottom(true);
     if (showChat && badgeCount) {
