@@ -15,19 +15,39 @@ export function toggleInputDisabled(): actionsTypes.ToggleInputDisabled {
   };
 }
 
-export function addUserMessage(text: string, id?: string): actionsTypes.AddUserMessage {
+export function addUserMessage(text: string, id?: string, time?: Date): actionsTypes.AddUserMessage {
   return {
     type: actionsTypes.ADD_NEW_USER_MESSAGE,
     text,
-    id
+    id,
+    time
   };
 }
 
-export function addResponseMessage(text: string, id?: string): actionsTypes.AddResponseMessage {
+export function addResponseMessage(text: string, id?: string, time?: Date): actionsTypes.AddResponseMessage {
   return {
     type: actionsTypes.ADD_NEW_RESPONSE_MESSAGE,
     text,
-    id
+    id,
+    time
+  };
+}
+
+export function addOldUserMessage(text: string, id?: string, time?: Date): actionsTypes.AddOldUserMessage {
+  return {
+    type: actionsTypes.ADD_OLD_USER_MESSAGE,
+    text,
+    id,
+    time
+  };
+}
+
+export function addOldResponseMessage(text: string, id?: string, time?: Date): actionsTypes.AddOldResponseMessage {
+  return {
+    type: actionsTypes.ADD_OLD_RESPONSE_MESSAGE,
+    text,
+    id,
+    time
   };
 }
 
@@ -37,11 +57,21 @@ export function toggleMsgLoader(): actionsTypes.ToggleMsgLoader {
   }
 }
 
-export function addLinkSnippet(link: LinkParams, id?: string): actionsTypes.AddLinkSnippet {
+export function addLinkSnippet(link: LinkParams, id?: string, time?: Date): actionsTypes.AddLinkSnippet {
   return {
     type: actionsTypes.ADD_NEW_LINK_SNIPPET,
     link,
-    id
+    id,
+    time
+  };
+}
+
+export function addOldLinkSnippet(link: LinkParams, id?: string, time?: Date): actionsTypes.AddOldLinkSnippet {
+  return {
+    type: actionsTypes.ADD_OLD_LINK_SNIPPET,
+    link,
+    id,
+    time
   };
 }
 

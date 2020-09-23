@@ -7,21 +7,22 @@ import Snippet from '../components/Widget/components/Conversation/components/Mes
 import QuickButton from '../components/Widget/components/Conversation/components/QuickButtons/components/QuickButton';
 
 import { MESSAGES_TYPES, MESSAGE_SENDER, MESSAGE_BOX_SCROLL_DURATION } from '../constants';
+import DateTimeFormat = Intl.DateTimeFormat;
 
-export function createNewMessage(text: string, sender: string, id?: string): MessageI {
+export function createNewMessage(text: string, sender: string, id?: string, time?: Date): MessageI {
   return {
     type: MESSAGES_TYPES.TEXT,
     component: Message,
     text,
     sender,
-    timestamp: new Date(),
+    timestamp: time || new Date(),
     showAvatar: sender === MESSAGE_SENDER.RESPONSE,
     customId: id,
     unread: sender === MESSAGE_SENDER.RESPONSE
   };
 }
 
-export function createLinkSnippet(link: LinkParams, id?: string) : Link {
+export function createLinkSnippet(link: LinkParams, id?: string, time?: Date) : Link {
   return {
     type: MESSAGES_TYPES.SNIPPET.LINK,
     component: Snippet,
@@ -29,7 +30,7 @@ export function createLinkSnippet(link: LinkParams, id?: string) : Link {
     link: link.link,
     target: link.target || '_blank',
     sender: MESSAGE_SENDER.RESPONSE,
-    timestamp: new Date(),
+    timestamp: time || new Date(),
     showAvatar: true,
     customId: id,
     unread: true

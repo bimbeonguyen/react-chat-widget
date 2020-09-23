@@ -6,8 +6,11 @@ import { MESSAGE_SENDER } from '../../constants';
 import {
   MessagesActions,
   ADD_NEW_USER_MESSAGE,
+  ADD_OLD_USER_MESSAGE,
   ADD_NEW_RESPONSE_MESSAGE,
+  ADD_OLD_RESPONSE_MESSAGE,
   ADD_NEW_LINK_SNIPPET,
+  ADD_OLD_LINK_SNIPPET,
   ADD_COMPONENT_MESSAGE,
   DROP_MESSAGES,
   HIDE_AVATAR,
@@ -22,14 +25,23 @@ const initialState = {
 };
 
 const messagesReducer = {
-  [ADD_NEW_USER_MESSAGE]: (state: MessagesState, { text, id }) =>
-    ({ ...state, messages: [...state.messages, createNewMessage(text, MESSAGE_SENDER.CLIENT, id)] }),
+  [ADD_NEW_USER_MESSAGE]: (state: MessagesState, { text, id, time }) =>
+    ({ ...state, messages: [...state.messages, createNewMessage(text, MESSAGE_SENDER.CLIENT, id, time)] }),
 
-  [ADD_NEW_RESPONSE_MESSAGE]: (state: MessagesState, { text, id }) => 
-    ({ ...state, messages: [...state.messages, createNewMessage(text, MESSAGE_SENDER.RESPONSE, id)], badgeCount: state.badgeCount + 1 }),
+  [ADD_NEW_RESPONSE_MESSAGE]: (state: MessagesState, { text, id, time }) =>
+    ({ ...state, messages: [...state.messages, createNewMessage(text, MESSAGE_SENDER.RESPONSE, id, time)], badgeCount: state.badgeCount + 1 }),
 
-  [ADD_NEW_LINK_SNIPPET]: (state: MessagesState, { link, id }) =>
-    ({ ...state, messages: [...state.messages, createLinkSnippet(link, id)] }),
+  [ADD_NEW_LINK_SNIPPET]: (state: MessagesState, { link, id, time }) =>
+    ({ ...state, messages: [...state.messages, createLinkSnippet(link, id, time)] }),
+
+  [ADD_OLD_USER_MESSAGE]: (state: MessagesState, { text, id, time }) =>
+    ({ ...state, messages: [createNewMessage(text, MESSAGE_SENDER.CLIENT, id, time), ...state.messages] }),
+
+  [ADD_OLD_RESPONSE_MESSAGE]: (state: MessagesState, { text, id, time }) =>
+    ({ ...state, messages: [createNewMessage(text, MESSAGE_SENDER.RESPONSE, id, time), ...state.messages], badgeCount: state.badgeCount + 1 }),
+
+  [ADD_OLD_LINK_SNIPPET]: (state: MessagesState, { link, id, time }) =>
+    ({ ...state, messages: [createLinkSnippet(link, id, time), ...state.messages] }),
 
   [ADD_COMPONENT_MESSAGE]: (state: MessagesState, { component, props, showAvatar, id }) =>
     ({ ...state, messages: [...state.messages, createComponentMessage(component, props, showAvatar, id)] }),

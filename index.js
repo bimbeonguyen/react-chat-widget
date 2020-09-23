@@ -13,6 +13,9 @@ import {
   deleteMessages,
   markAllAsRead,
   setBadgeCount,
+  addOldLinkSnippet,
+  addOldResponseMessage,
+  addOldUserMessage
 } from './src/store/dispatcher';
 
 export {
@@ -29,5 +32,8 @@ export {
   setQuickButtons,
   deleteMessages,
   markAllAsRead,
-  setBadgeCount
+  setBadgeCount,
+  addOldResponseMessage,
+  addOldUserMessage,
+  addOldLinkSnippet
 };

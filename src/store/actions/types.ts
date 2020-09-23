@@ -9,6 +9,9 @@ export const SET_BADGE_COUNT = 'BEHAVIOR/SET_BADGE_COUNT';
 export const ADD_NEW_USER_MESSAGE = 'MESSAGES/ADD_NEW_USER_MESSAGE';
 export const ADD_NEW_RESPONSE_MESSAGE = 'MESSAGES/ADD_NEW_RESPONSE_MESSAGE';
 export const ADD_NEW_LINK_SNIPPET = 'MESSAGES/ADD_NEW_LINK_SNIPPET';
+export const ADD_OLD_USER_MESSAGE = 'MESSAGES/ADD_OLD_USER_MESSAGE';
+export const ADD_OLD_RESPONSE_MESSAGE = 'MESSAGES/ADD_OLD_RESPONSE_MESSAGE';
+export const ADD_OLD_LINK_SNIPPET = 'MESSAGES/ADD_OLD_LINK_SNIPPET';
 export const ADD_COMPONENT_MESSAGE = 'MESSAGES/ADD_COMPONENT_MESSAGE';
 export const DROP_MESSAGES = 'MESSAGES/DROP_MESSAGES';
 export const HIDE_AVATAR = 'MESSAGES/HIDE_AVATAR';
@@ -30,12 +33,28 @@ export interface AddUserMessage {
   type: typeof ADD_NEW_USER_MESSAGE;
   text: string;
   id?: string;
+  time?: Date;
 }
 
 export interface AddResponseMessage {
   type: typeof ADD_NEW_RESPONSE_MESSAGE;
   text: string;
   id?: string;
+  time?: Date;
+}
+
+export interface AddOldUserMessage {
+  type: typeof ADD_OLD_USER_MESSAGE;
+  text: string;
+  id?: string;
+  time?: Date;
+}
+
+export interface AddOldResponseMessage {
+  type: typeof ADD_OLD_RESPONSE_MESSAGE;
+  text: string;
+  id?: string;
+  time?: Date;
 }
 
 export interface ToggleMsgLoader {
@@ -46,6 +65,14 @@ export interface AddLinkSnippet {
   type: typeof ADD_NEW_LINK_SNIPPET;
   link: LinkParams;
   id?: string;
+  time?: Date;
+}
+
+export interface AddOldLinkSnippet {
+  type: typeof ADD_OLD_LINK_SNIPPET;
+  link: LinkParams;
+  id?: string;
+  time?: Date;
 }
 
 export interface RenderCustomComponent {
@@ -88,7 +115,8 @@ export interface MarkAllMessagesRead {
 export type BehaviorActions = ToggleChat | ToggleInputDisabled | ToggleMsgLoader;
 
 export type MessagesActions = AddUserMessage | AddResponseMessage | AddLinkSnippet | RenderCustomComponent
-                              | DropMessages | HideAvatar | DeleteMessages | MarkAllMessagesRead | SetBadgeCount;
+                              | DropMessages | HideAvatar | DeleteMessages | MarkAllMessagesRead | SetBadgeCount
+                              | AddOldUserMessage | AddOldResponseMessage | AddOldLinkSnippet;
 
 export type QuickButtonsActions = SetQuickButtons;
 
