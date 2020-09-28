@@ -80,8 +80,9 @@ function Widget({
     }
 
     handleSubmit?.(userInput);
-    dispatch(addUserMessage(userInput));
-    handleNewUserMessage(userInput);
+    handleNewUserMessage(userInput, (messageId) => {
+      dispatch(addUserMessage(userInput, messageId));
+    });
     event.target.message.value = '';
   }
 
