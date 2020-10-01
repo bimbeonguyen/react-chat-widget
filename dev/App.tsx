@@ -1,18 +1,22 @@
 import React, { Component } from 'react';
 
-import { Widget, addResponseMessage, setQuickButtons, toggleMsgLoader, addLinkSnippet } from '../index';
+import { Widget, addResponseMessage, setQuickButtons, toggleMsgLoader, addLinkSnippet, addOldUserMessage, addOldResponseMessage } from '../index';
 import { addUserMessage } from '..';
 
 export default class App extends Component {
   componentDidMount() {
-    addResponseMessage('Welcome to this awesome chat!');
-    addLinkSnippet({ link: 'https://google.com', title: 'Google' });
-    addResponseMessage('![](https://raw.githubusercontent.com/Wolox/press-kit/master/logos/logo_banner.png)');
-    addResponseMessage('![vertical](https://d2sofvawe08yqg.cloudfront.net/reintroducing-react/hero2x?1556470143)');
+    for (let i = 1; i < 40; i += 1) {
+      addUserMessage('Hi');
+      addResponseMessage('Welcome to this awesome chat!');
+      addLinkSnippet({ link: 'https://google.com', title: 'Google' });
+      addResponseMessage('![](https://raw.githubusercontent.com/Wolox/press-kit/master/logos/logo_banner.png)');
+      addResponseMessage('![vertical](https://d2sofvawe08yqg.cloudfront.net/reintroducing-react/hero2x?1556470143)');
+    }
   }
 
-  handleNewUserMessage = (newMessage: any) => {
+  handleNewUserMessage = (newMessage: any, callback: Function) => {
     toggleMsgLoader();
+    callback(Math.random());
     setTimeout(() => {
       toggleMsgLoader();
       if (newMessage === 'fruits') {
@@ -36,6 +40,13 @@ export default class App extends Component {
     return true;
   }
 
+  loadMoreMessages = () => {
+    for (let i = 1; i < 20; i += 1) {
+      addOldUserMessage('XXXXXXXXX');
+      addOldResponseMessage('YYYYYYYYYYYY');
+    }
+  }
+
   render() {
     return (
       <div>
@@ -48,6 +59,9 @@ export default class App extends Component {
           handleQuickButtonClicked={this.handleQuickButtonClicked}
           imagePreview
           handleSubmit={this.handleSubmit}
+          ChatList={() => null}
+          LoadingIcon={() => (<div>Loading...</div>)}
+          loadMoreMessages={this.loadMoreMessages}
         />
       </div>
     );

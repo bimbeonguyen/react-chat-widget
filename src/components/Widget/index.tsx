@@ -65,7 +65,6 @@ function Widget({
 
   const toggleConversation = () => {
     dispatch(toggleChat());
-    debugger;
     if (onToggleChat) {
       onToggleChat();
     }

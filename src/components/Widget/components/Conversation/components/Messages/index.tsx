@@ -1,11 +1,8 @@
-import React, { useEffect, useRef, useState, useCallback, RefObject } from 'react';
+import React, { useEffect, useState, useCallback, useContext, memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { usePrevious, useScrolling } from 'react-use';
-import { useBottomScrollListener } from 'react-bottom-scroll-listener';
-import { useInView } from 'react-intersection-observer';
+import { usePrevious } from 'react-use';
 import moment from 'moment';
-import { useObserveScrollPosition, useAtTop, useAtBottom, Panel, Composer } from 'react-scroll-to-bottom';
-import { scrollToBottom } from '../../../../../../utils/messages';
+import { Composer, Panel, useScrollTo, useAtTop, useAtBottom, useScrollToBottom, useScrollHeight, useScrollTarget } from '@bimbeo160/react-scroll-to-bottom';
 import { Message, Link, CustomCompMessage, GlobalState } from '../../../../../../store/types';
 import { setBadgeCount, markAllMessagesRead } from '@actions';
 
@@ -22,32 +19,13 @@ type Props = {
   LoadingIcon?: React.ElementType;
 }
 
-function Messages({ profileAvatar, showTimeStamp, loadMoreMessages, LoadingIcon }: Props) {
-  const dispatch = useDispatch();
-  const { messages, typing, showChat, badgeCount } = useSelector((state: GlobalState) => ({
-    messages: state.messages.messages,
-    badgeCount: state.messages.badgeCount,
-    typing: state.behavior.messageLoader,
-    showChat: state.behavior.showChat
-  }));
-  const prevMessages = usePrevious<(Message | Link | CustomCompMessage)[]>(messages);
-  // tracking on which page we currently are
-  const [atBottom, setAtBottom] = useState(true);
-  const [scrollHeight, setScrollHeight] = useState(0);
-  const loadingRef = useRef() as React.MutableRefObject<HTMLInputElement>;
-  const [inViewRef, inView] = useInView({
-    rootMargin: "0px",
-    threshold: 1.0
-  });
-  const onBottom = () => {
-    setAtBottom(true);
-    if (showChat && badgeCount) {
-      dispatch(markAllMessagesRead());
-    }
-  };
-  const containerRef = useBottomScrollListener(onBottom) as RefObject<HTMLDivElement>;
-  const scrolling = useScrolling(containerRef);
-  const prevScrolling = usePrevious(scrolling);
+type MessageListProps = {
+  messages: any,
+  profileAvatar?: string;
+}
+
+const MessageList = memo((props: MessageListProps) => {
+  const { messages, profileAvatar } = props;
   // here we handle what happens when user scrolls to Load More div
   // in this case we just update page variable
   const getComponentToRender = (message: Message | Link | CustomCompMessage, index: number) => {
@@ -92,27 +70,43 @@ function Messages({ profileAvatar, showTimeStamp, loadMoreMessages, LoadingIcon 
       />
     );
   };
-  // Use `useCallback` so we don't recreate the function on each render - Could result in infinite loop
-  const setRefs = useCallback(
-    (node) => {
-      // Ref's from useRef needs to have the node assigned to `current`
-      loadingRef.current = node;
-      // Callback refs, like the one from `useInView`, is a function that takes the node as an argument
-      inViewRef(node);
-    },
-    [inViewRef],
-  );
-  // TODO: Fix this function or change to move the avatar to last message from response
-  // const shouldRenderAvatar = (message: Message, index: number) => {
-  //   const previousMessage = messages[index - 1];
-  //   if (message.showAvatar && previousMessage.showAvatar) {
-  //     dispatch(hideAvatar(index));
-  //   }
-  // }
+
+  return messages?.map((message, index) =>
+    <div className="rcw-message" key={message.customId} id={message.customId}>
+      {profileAvatar &&
+      message.showAvatar &&
+      <img src={profileAvatar} className="rcw-avatar" alt="profile" />
+      }
+      {getComponentToRender(message, index)}
+    </div>
+  )
+})
+
+const Content = (props: Props) => {
+  const dispatch = useDispatch();
+  const { messages, typing, showChat, badgeCount } = useSelector((state: GlobalState) => ({
+    messages: state.messages.messages,
+    badgeCount: state.messages.badgeCount,
+    typing: state.behavior.messageLoader,
+    showChat: state.behavior.showChat
+  }));
+  const { LoadingIcon, profileAvatar, loadMoreMessages } = props;
+  const [scrollHeight] = useScrollHeight();
+  const [target] = useScrollTarget();
+  const [atBottom] = useAtBottom();
+  const [atTop] = useAtTop();
+  const scrollTo = useScrollTo();
+  const scrollToBottom = useScrollToBottom();
+  const prevMessages = usePrevious<(Message | Link | CustomCompMessage)[]>(messages);
+  const onBottom = () => {
+    if (showChat && badgeCount) {
+      dispatch(markAllMessagesRead());
+    }
+  };
 
   useEffect(() => {
     const handleAtBottom = () => {
-      scrollToBottom(containerRef.current);
+      scrollToBottom({ behavior: 'smooth' });
       if (showChat && badgeCount) {
         dispatch(markAllMessagesRead());
       } else dispatch(setBadgeCount(messages.filter((message) => message.unread).length));
@@ -123,13 +117,8 @@ function Messages({ profileAvatar, showTimeStamp, loadMoreMessages, LoadingIcon 
       const prevLatestMessage = (prevMessages || [])[(prevMessages || []).length - 1];
       const initialPrevMessage = (prevMessages || [])[0];
 
-      if (initialPrevMessage && latestMessage?.customId === prevLatestMessage?.customId) {
-        if (containerRef.current) {
-          containerRef.current.scrollTo({
-            top: containerRef.current.scrollHeight - scrollHeight,
-            behavior: 'auto'
-          });
-        }
+      if (initialPrevMessage && latestMessage?.customId === prevLatestMessage?.customId && (target.scrollHeight !== scrollHeight)) {
+        scrollTo(target.scrollHeight - scrollHeight, { behavior: 'auto' });
       } else if (latestMessage?.customId !== prevLatestMessage?.customId && (latestMessage?.sender === MESSAGE_SENDER.CLIENT || !prevMessages?.length)) {
         handleAtBottom();
       }
@@ -138,39 +127,42 @@ function Messages({ profileAvatar, showTimeStamp, loadMoreMessages, LoadingIcon 
     }
   }, [messages, badgeCount, showChat]);
   useEffect(() => {
-    if (scrolling && atBottom) {
-      setAtBottom(false);
-    }
-  }, [prevScrolling]);
-  useEffect(() => {
-    if (inView && !atBottom && loadMoreMessages) {
+    if (atTop && loadMoreMessages) {
       loadMoreMessages();
-
-      if (containerRef.current) {
-        setScrollHeight(containerRef.current.scrollHeight);
-      }
     }
-  }, [inView]);
+  }, [atTop]);
+  useEffect(() => {
+    if (atBottom) {
+      onBottom();
+    }
+  }, [atBottom]);
 
   return (
-    <div id="messages" className="rcw-messages-container" ref={containerRef}>
+    <>
       {LoadingIcon && (
-        <div ref={setRefs}>
+        <div>
           <LoadingIcon />
         </div>
       )}
-      {messages?.map((message, index) =>
-        <div className="rcw-message" key={message.customId} id={message.customId}>
-          {profileAvatar &&
-            message.showAvatar &&
-            <img src={profileAvatar} className="rcw-avatar" alt="profile" />
-          }
-          {getComponentToRender(message, index)}
-        </div>
-      )}
+      <MessageList messages={messages} profileAvatar={profileAvatar} />
       <ReactTooltip id="global" />
       <Loader typing={typing} />
-    </div>
+    </>
+  );
+};
+
+function Messages({ profileAvatar, showTimeStamp, loadMoreMessages, LoadingIcon }: Props) {
+  return (
+    <Composer>
+      <Panel className="rcw-messages-container">
+        <Content
+          LoadingIcon={LoadingIcon}
+          profileAvatar={profileAvatar}
+          showTimeStamp={showTimeStamp}
+          loadMoreMessages={loadMoreMessages}
+        />
+      </Panel>
+    </Composer>
   );
 }
 

@@ -4,6 +4,7 @@
 
 import { ElementType } from 'react';
 
+declare module '@bimbeo160/react-scroll-to-bottom';
 declare const Widget: ElementType;
 
 export function addUserMessage(text: string): void;
